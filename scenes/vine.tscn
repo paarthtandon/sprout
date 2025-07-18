@@ -1,0 +1,17 @@
+[gd_scene load_steps=4 format=3 uid="uid://oiw8dfvkk67o"]
+
+[ext_resource type="Script" uid="uid://bvda4qnhby7fm" path="res://scripts/vine.gd" id="1_c6ol5"]
+[ext_resource type="TileSet" uid="uid://bkfnpj7i06sf8" path="res://scenes/tileset.tres" id="1_smajk"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_c6ol5"]
+
+[node name="Vine" type="Area2D"]
+script = ExtResource("1_c6ol5")
+
+[node name="TileMapLayer" type="TileMapLayer" parent="."]
+tile_map_data = PackedByteArray(0, 0, 2, 0, 7, 0, 2, 0, 16, 0, 2, 0, 0, 0)
+tile_set = ExtResource("1_smajk")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_c6ol5")
+disabled = true
