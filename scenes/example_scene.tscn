@@ -52,7 +52,7 @@ position = Vector2(798, 1241)
 position = Vector2(336, 1566)
 
 [node name="Betel2" parent="." instance=ExtResource("7_0vo67")]
-position = Vector2(470, 1572)
+position = Vector2(2451, 1204)
 walk_direction = Vector2(-1, 0)
 
 [node name="Button" parent="." instance=ExtResource("8_ax1pq")]

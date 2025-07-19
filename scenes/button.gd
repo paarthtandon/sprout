@@ -10,34 +10,44 @@ enum ButtonColor {
 # Exported properties for easy configuration
 @export var color_variant: ButtonColor = ButtonColor.RED
 @export var associated_door_path: NodePath  # Path to the door this button controls
+@export var toggle_mode: bool = true  # If true, button toggles. If false, works as pressure plate
 @export var debug_mode: bool = true
 
 # Button state
 var is_pressed: bool = false
-var objects_on_button: Array = []  # Track what's currently on the button
 var associated_door: Node = null
 var tile_map: TileMapLayer
+
+# Toggle system
+var toggle_cooldown: float = 0.0
+const TOGGLE_COOLDOWN_DURATION: float = 0.5  # Prevent rapid toggling
+
+# Pressure plate system (for non-toggle mode)
+var _objects_on_button: Array = []
 
 # Tile coordinate mappings for each color variant
 var color_tile_coords = {
 	ButtonColor.RED: {
-		"unpressed": Vector2i(17, 0),
-		"pressed": Vector2i(16, 0)
+		"pressed": Vector2i(17, 0),
+		"unpressed": Vector2i(16, 0)
 	},
 	ButtonColor.GREEN: {
-		"unpressed": Vector2i(20, 0),
-		"pressed": Vector2i(19, 0)
+		"pressed": Vector2i(20, 0),
+		"unpressed": Vector2i(19, 0)
 	},
 	ButtonColor.BLUE: {
-		"unpressed": Vector2i(23, 0),
-		"pressed": Vector2i(22, 0)
+		"pressed": Vector2i(23, 0),
+		"unpressed": Vector2i(22, 0)
 	}
 }
 
 func _ready() -> void:
 	# Connect area signals for detection
 	body_entered.connect(_on_body_entered)
-	body_exited.connect(_on_body_exited)
+	
+	# For pressure plate mode, also connect body_exited
+	if not toggle_mode:
+		body_exited.connect(_on_body_exited)
 	
 	# Get the TileMapLayer for visual updates
 	tile_map = $TileMapLayer
@@ -70,23 +80,36 @@ func _get_unpressed_coords() -> Vector2i:
 func _get_pressed_coords() -> Vector2i:
 	return color_tile_coords[color_variant]["pressed"]
 
+func _process(delta: float) -> void:
+	# Update toggle cooldown
+	if toggle_cooldown > 0:
+		toggle_cooldown -= delta
+
 func _on_body_entered(body: Node2D) -> void:
-	# Check if it's the player or betel
 	if _is_valid_activator(body):
-		objects_on_button.append(body)
-		_update_button_state()
-		
-		# if debug_mode:
-			# print(body.name, " stepped on button")
+		if toggle_mode:
+			# Toggle mode: toggle state with cooldown
+			if toggle_cooldown <= 0:
+				is_pressed = !is_pressed
+				toggle_cooldown = TOGGLE_COOLDOWN_DURATION
+				
+				_update_visual_state()
+				_trigger_door()
+				
+				if debug_mode:
+					print(body.name, " toggled button to: ", "PRESSED" if is_pressed else "RELEASED")
+		else:
+			# Pressure plate mode: add to tracking array
+			if not _objects_on_button.has(body):
+				_objects_on_button.append(body)
+				_update_pressure_plate_state()
 
 func _on_body_exited(body: Node2D) -> void:
-	# Remove from the list if it was tracked
-	if body in objects_on_button:
-		objects_on_button.erase(body)
-		_update_button_state()
-		
-		# if debug_mode:
-			# print(body.name, " stepped off button")
+	# Only used in pressure plate mode
+	if not toggle_mode and _is_valid_activator(body):
+		if _objects_on_button.has(body):
+			_objects_on_button.erase(body)
+			_update_pressure_plate_state()
 
 func _is_valid_activator(body: Node2D) -> bool:
 	# Check if the body is a player or betel
@@ -98,17 +121,27 @@ func _is_valid_activator(body: Node2D) -> bool:
 		return true
 	return false
 
-func _update_button_state() -> void:
-	var should_be_pressed = objects_on_button.size() > 0
+# Helper function to manually set button state (for scripting)
+func set_button_state(pressed: bool) -> void:
+	if pressed != is_pressed:
+		is_pressed = pressed
+		_update_visual_state()
+		_trigger_door()
+		
+		if debug_mode:
+			print("Button manually set to: ", "PRESSED" if is_pressed else "RELEASED")
+
+# Pressure plate mode state update
+func _update_pressure_plate_state() -> void:
+	var should_be_pressed = _objects_on_button.size() > 0
 	
-	# Only trigger door action if state actually changed
 	if should_be_pressed != is_pressed:
 		is_pressed = should_be_pressed
+		_update_visual_state()
 		_trigger_door()
-		_update_visual_state()  # Update the button sprite
 		
-		# if debug_mode:
-			# print("Button ", "PRESSED" if is_pressed else "RELEASED")
+		if debug_mode:
+			print("Pressure plate button: ", "PRESSED" if is_pressed else "RELEASED")
 
 func _update_visual_state() -> void:
 	if not tile_map:

@@ -12,3 +12,8 @@ Show runes under plant *
 Grey out runes when not usable
 Platforms
 drop down *
+
+make buttons press
+make the buttons opposite
+make mushroom 
+lower resolution

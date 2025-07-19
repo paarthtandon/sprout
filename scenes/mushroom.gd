@@ -180,6 +180,9 @@ func build_state_m() -> void:
 	# 5) Update collision shapes based on current state
 	_update_collision_shapes()
 	
+	# 6) Fix player position if they're stuck after collision change
+	_fix_player_position_if_stuck()
+	
 	# if debug_mode:
 		# print("State build complete. Placed ", tile_count, " tiles.")
 	
@@ -250,6 +253,82 @@ func _has_growth() -> bool:
 func set_debug_mode(enabled: bool) -> void:
 	debug_mode = enabled
 	# print("Debug mode ", "enabled" if enabled else "disabled")
+
+# Fix player position if they get stuck inside collision after state change
+func _fix_player_position_if_stuck() -> void:
+	# Find the player in the scene
+	var player = get_tree().current_scene.find_child("Player", true, false)
+	if not player:
+		return
+	
+	# Check if player is close enough to potentially be stuck
+	var distance_to_player = global_position.distance_to(player.global_position)
+	if distance_to_player > 200:  # Only check if player is nearby
+		return
+	
+	# Check if player is overlapping with our collision shapes
+	var space_state = get_world_2d().direct_space_state
+	var player_shape = player.get_node("CollisionShape2D").shape
+	var player_transform = Transform2D(0, player.global_position)
+	
+	# Create a collision query for the player's current position
+	var query = PhysicsShapeQueryParameters2D.new()
+	query.collision_mask = 1  # Check against collision layer 1
+	query.shape = player_shape
+	query.transform = player_transform
+	
+	var collisions = space_state.intersect_shape(query)
+	
+	# Check if any collision is with this mushroom
+	for collision in collisions:
+		var collider = collision.get("collider")
+		if collider == self:
+			# Player is stuck! Push them to safety
+			_push_player_to_safety(player)
+			break
+
+func _push_player_to_safety(player: CharacterBody2D) -> void:
+	# Try pushing the player in different directions to find a safe spot
+	var push_directions = [
+		Vector2(0, -150),   # Up (preferred for mushrooms)
+		Vector2(-100, -100), # Up-left diagonal
+		Vector2(100, -100),  # Up-right diagonal
+		Vector2(-150, 0),    # Left
+		Vector2(150, 0),     # Right
+		Vector2(0, 50)       # Down (last resort)
+	]
+	
+	var original_position = player.global_position
+	
+	for direction in push_directions:
+		var test_position = original_position + direction
+		
+		# Test if this position is safe
+		if _is_position_safe_for_player(player, test_position):
+			player.global_position = test_position
+			if debug_mode:
+				print("Player pushed to safety: ", direction)
+			return
+	
+	# If no safe position found, push up as fallback
+	player.global_position = original_position + Vector2(0, -200)
+	if debug_mode:
+		print("Player pushed up (fallback)")
+
+func _is_position_safe_for_player(player: CharacterBody2D, test_position: Vector2) -> bool:
+	# Check if the test position is free of collisions
+	var space_state = get_world_2d().direct_space_state
+	var player_shape = player.get_node("CollisionShape2D").shape
+	var test_transform = Transform2D(0, test_position)
+	
+	var query = PhysicsShapeQueryParameters2D.new()
+	query.collision_mask = 1  # Check against solid objects
+	query.shape = player_shape
+	query.transform = test_transform
+	query.exclude = [player]  # Don't check against the player itself
+	
+	var collisions = space_state.intersect_shape(query)
+	return collisions.is_empty()  # Safe if no collisions
 
 # Function to handle bouncing - called by player when collision is detected
 func get_bounce_vector(collision_normal: Vector2) -> Vector2:
