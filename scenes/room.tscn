@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://bpkrbknrwda44"]
+
+[ext_resource type="Script" uid="uid://bgkv4a3m6coo4" path="res://scripts/room.gd" id="1_room"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_room"]
+size = Vector2(3072, 2048)
+
+[node name="Room" type="Area2D"]
+script = ExtResource("1_room")
+room_name = "Room Template"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_room")

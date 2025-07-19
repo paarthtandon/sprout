@@ -1,5 +1,8 @@
 extends StaticBody2D
 
+# Exported variable to control maximum number of runes (state items)
+@export var max_runes: int = 2
+
 const BASE_LOC = Vector2i(0, 0) # base location in scene
 const SOURCE_ID = 2  # Correct source ID from tileset.tres
 
@@ -20,6 +23,7 @@ const STATES = {
 var tile_map: TileMapLayer
 var state_m := []   # e.g. [ "F", "G" ]
 var debug_mode := true
+var rune_ui: Node2D  # Reference to the rune UI component
 
 # Bounce properties - exported for easy tuning
 @export var growth_bounce_force: float = 3500.0
@@ -36,6 +40,11 @@ func _ready() -> void:
 	if not tile_map:
 		push_error("TileMapLayer node not found! Please check scene structure.")
 		return
+	
+	# Find the rune UI component
+	rune_ui = $RuneUI
+	if not rune_ui:
+		print("RuneUI not found - rune display will not be available")
 	
 	# Create collision shapes for bouncing
 	_setup_collision_shapes()
@@ -87,12 +96,14 @@ func handle_plant_input(action: String) -> void:
 			grow_u()
 		"flor_u":
 			flor_u()
+		"clear_runes":
+			clear_runes()
 		_:
 			if debug_mode:
 				print("Unknown plant action: ", action)
 
 func grow() -> void:
-	if state_m.count("G") < 1 and len(state_m) < 2:
+	if state_m.count("G") < 1 and len(state_m) < max_runes:
 		state_m.push_front("G")
 		# if debug_mode:
 			# print("Growing! New state_m: ", state_m)
@@ -102,7 +113,7 @@ func grow() -> void:
 	build_state_m()
 
 func flor() -> void:
-	if state_m.count("F") < 1 and len(state_m) < 2:
+	if state_m.count("F") < 1 and len(state_m) < max_runes:
 		state_m.push_front("F")
 		# if debug_mode:
 			# print("Flowering! New state_m: ", state_m)
@@ -171,6 +182,9 @@ func build_state_m() -> void:
 	
 	# if debug_mode:
 		# print("State build complete. Placed ", tile_count, " tiles.")
+	
+	# Notify UI of state change
+	_notify_ui_update()
 
 func _update_collision_shapes() -> void:
 	# Disable all collision shapes first
@@ -211,6 +225,18 @@ func reset() -> void:
 	# if debug_mode:
 		# print("Mushroom reset to initial state_m")
 	build_state_m()
+
+# Clear all runes (same as reset)
+func clear_runes() -> void:
+	state_m.clear()
+	if debug_mode:
+		print("All runes cleared from mushroom!")
+	build_state_m()
+
+# Notify UI of state changes
+func _notify_ui_update() -> void:
+	if rune_ui and rune_ui.has_method("update_display"):
+		rune_ui.update_display()
 
 # Helper function to check if mushroom has flower
 func _has_flower() -> bool:

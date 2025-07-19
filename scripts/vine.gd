@@ -1,5 +1,8 @@
 extends Area2D
 
+# Exported variable to control maximum number of runes (state items)
+@export var max_runes: int = 3
+
 const BASE_LOC = Vector2i(0, 0) # base location in scene
 const SOURCE_ID = 2  # Correct source ID from tileset.tres
 
@@ -93,12 +96,18 @@ const STATES = {
 var tile_map: TileMapLayer
 var state_v := []   # e.g. [ "F", "G", "G" ]
 var debug_mode := true  # Set to false to disable debug output
+var rune_ui: Node2D  # Reference to the rune UI component
 
 func _ready() -> void:
 	tile_map = $TileMapLayer
 	if not tile_map:
 		push_error("TileMapLayer node not found! Please check scene structure.")
 		return
+	
+	# Find the rune UI component
+	rune_ui = $RuneUI
+	if not rune_ui:
+		print("RuneUI not found - rune display will not be available")
 	
 	# Add this vine to the plants group for proximity detection
 	add_to_group("plants")
@@ -119,12 +128,14 @@ func handle_plant_input(action: String) -> void:
 			grow_u()
 		"flor_u":
 			flor_u()
+		"clear_runes":
+			clear_runes()
 		_:
 			if debug_mode:
 				print("Unknown plant action: ", action)
 
 func grow() -> void:
-	if state_v.count("G") < 3 and len(state_v) < 3:
+	if state_v.count("G") < 3 and len(state_v) < max_runes:
 		state_v.push_front("G")
 		# if debug_mode:
 			# print("Growing! New state_v: ", state_v)
@@ -134,7 +145,7 @@ func grow() -> void:
 	build_state_v()
 
 func flor() -> void:
-	if state_v.count("F") < 1 and len(state_v) < 3:
+	if state_v.count("F") < 1 and len(state_v) < max_runes:
 		state_v.push_front("F")
 		# if debug_mode:
 			# print("Flowering! New state_v: ", state_v)
@@ -201,6 +212,9 @@ func build_state_v() -> void:
 	
 	# if debug_mode:
 		# print("State build complete. Placed ", tile_count, " tiles.")
+	
+	# Notify UI of state change
+	_notify_ui_update()
 
 # Helper function to get current state_v as string
 func get_state_v_string() -> String:
@@ -217,6 +231,18 @@ func reset() -> void:
 	# if debug_mode:
 		# print("Vine reset to initial state_v")
 	build_state_v()
+
+# Clear all runes (same as reset)
+func clear_runes() -> void:
+	state_v.clear()
+	if debug_mode:
+		print("All runes cleared from vine!")
+	build_state_v()
+
+# Notify UI of state changes
+func _notify_ui_update() -> void:
+	if rune_ui and rune_ui.has_method("update_display"):
+		rune_ui.update_display()
 
 # Helper function to set debug mode
 func set_debug_mode(enabled: bool) -> void:

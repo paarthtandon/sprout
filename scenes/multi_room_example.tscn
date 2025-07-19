@@ -1,0 +1,67 @@
+[gd_scene load_steps=8 format=4 uid="uid://iut8suyqj2ua"]
+
+[ext_resource type="TileSet" uid="uid://bkfnpj7i06sf8" path="res://scenes/tileset.tres" id="1_tileset"]
+[ext_resource type="PackedScene" uid="uid://c0jym4esvdagy" path="res://scenes/player.tscn" id="2_player"]
+[ext_resource type="Script" uid="uid://dotpb7wpou0ee" path="res://scripts/camera_controller.gd" id="3_camera"]
+[ext_resource type="Script" uid="uid://bgkv4a3m6coo4" path="res://scripts/room.gd" id="4_room"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_room1"]
+size = Vector2(3072, 2048)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_room2"]
+size = Vector2(3072, 2048)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_room3"]
+size = Vector2(3072, 2048)
+
+[node name="MultiRoomScene" type="Node2D"]
+
+[node name="CameraController" type="Camera2D" parent="."]
+script = ExtResource("3_camera")
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+position = Vector2(500, 800)
+
+[node name="Rooms" type="Node2D" parent="."]
+
+[node name="Room1" type="Area2D" parent="Rooms"]
+position = Vector2(1536, 1024)
+script = ExtResource("4_room")
+room_name = "Starting Room"
+camera_position = Vector2(1536, 1024)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Rooms/Room1"]
+shape = SubResource("RectangleShape2D_room1")
+
+[node name="TileMapLayer" type="TileMapLayer" parent="Rooms/Room1"]
+position = Vector2(-1024, -768)
+tile_map_data = PackedByteArray("AAAA/xAAAgAGAAIAAAAB/xAAAgAGAAIAAAAC/xAAAgAGAAIAAAAD/xAAAgAGAAIAAAAE/xAAAgAGAAIAAAAF/xAAAgAGAAIAAAAG/xAAAgAGAAIAAAAH/xAAAgAGAAIAAAAI/xAAAgAGAAIAAAAJ/xAAAgAGAAIAAAAK/xAAAgAGAAIAAAAL/xAAAgAGAAIAAAAM/xAAAgAGAAIAAAAN/xAAAgAGAAIAAAAO/xAAAgAGAAIAAAAP/xAAAgAGAAIAAAAQ/xAAAgAGAAIAAAAR/xAAAgAGAAIAAAAS/xAAAgAGAAIAAAAT/xAAAgAGAAIAAAAU/xAAAgAGAAIAAAAV/xAAAgAGAAIAAAAW/xAAAgAGAAIAAAAX/xAAAgAGAAIAAAAY/xAAAgAGAAIAAAAZ/xAAAgAGAAIAAAD+/wcAAgAKAAIAAAD//wcAAgAKAAIAAAAAAAcAAgAKAAIAAAABAAcAAgAKAAIAAAACAAcAAgAKAAIAAAADAAcAAgAKAAIAAAAEAAcAAgAKAAIAAAAFAAcAAgAKAAIAAAAGAAcAAgAKAAIAAAAHAAcAAgAKAAIAAAAIAAcAAgAKAAIAAAAJAAcAAgAKAAIAAAAKAAcAAgAKAAIAAAALAAcAAgAKAAIAAAAMAAcAAgAKAAIAAAANAAcAAgAKAAIAAAAOAAcAAgAKAAIAAAAPAAcAAgAKAAIAAAAQAAcAAgAKAAIAAAARAAcAAgAKAAIAAAASAAcAAgAKAAIAAAATAAcAAgAKAAIAAAAUAAcAAgAKAAIAAAAVAAcAAgAKAAIAAAAWAAcAAgAKAAIAAAAXAAcAAgAKAAIAAAAYAAcAAgAKAAIAAAAZAAcAAgAKAAIAAAAaAAcAAgAKAAIAAAAbAAcAAgAKAAIAAAAcAAcAAgAKAAIAAAAdAAcAAgAKAAIAAAA=")
+tile_set = ExtResource("1_tileset")
+
+[node name="Room2" type="Area2D" parent="Rooms"]
+position = Vector2(4608, 1024)
+script = ExtResource("4_room")
+room_name = "Second Room"
+camera_position = Vector2(4608, 1024)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Rooms/Room2"]
+shape = SubResource("RectangleShape2D_room2")
+
+[node name="TileMapLayer" type="TileMapLayer" parent="Rooms/Room2"]
+position = Vector2(-1024, -768)
+tile_map_data = PackedByteArray("AAAA/xAAAgAGAAIAAAAB/xAAAgAGAAIAAAAC/xAAAgAGAAIAAAAD/xAAAgAGAAIAAAAE/xAAAgAGAAIAAAAF/xAAAgAGAAIAAAAG/xAAAgAGAAIAAAAH/xAAAgAGAAIAAAAI/xAAAgAGAAIAAAAJ/xAAAgAGAAIAAAAK/xAAAgAGAAIAAAAL/xAAAgAGAAIAAAAM/xAAAgAGAAIAAAAN/xAAAgAGAAIAAAAO/xAAAgAGAAIAAAAP/xAAAgAGAAIAAAAQ/xAAAgAGAAIAAAAR/xAAAgAGAAIAAAAS/xAAAgAGAAIAAAAT/xAAAgAGAAIAAAAU/xAAAgAGAAIAAAAV/xAAAgAGAAIAAAAW/xAAAgAGAAIAAAAX/xAAAgAGAAIAAAAY/xAAAgAGAAIAAAAZ/xAAAgAGAAIAAAD8/wcAAgAKAAIAAAD9/wcAAgAKAAIAAAD+/wcAAgAKAAIAAAD//wcAAgAKAAIAAAAAAAcAAgAKAAIAAAABAAcAAgAKAAIAAAACAAcAAgAKAAIAAAADAAcAAgAKAAIAAAAEAAcAAgAKAAIAAAAFAAcAAgAKAAIAAAAGAAcAAgAKAAIAAAAHAAcAAgAKAAIAAAAIAAcAAgAKAAIAAAAJAAcAAgAKAAIAAAAKAAcAAgAKAAIAAAALAAcAAgAKAAIAAAAMAAcAAgAKAAIAAAANAAcAAgAKAAIAAAAOAAcAAgAKAAIAAAAPAAcAAgAKAAIAAAAQAAcAAgAKAAIAAAARAAcAAgAKAAIAAAASAAcAAgAKAAIAAAATAAcAAgAKAAIAAAA=")
+tile_set = ExtResource("1_tileset")
+
+[node name="Room3" type="Area2D" parent="Rooms"]
+position = Vector2(7692, 1033)
+script = ExtResource("4_room")
+room_name = "Third Room"
+camera_position = Vector2(7692, 1033)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Rooms/Room3"]
+shape = SubResource("RectangleShape2D_room3")
+
+[node name="TileMapLayer" type="TileMapLayer" parent="Rooms/Room3"]
+position = Vector2(-1536, -1024)
+tile_map_data = PackedByteArray("AAAA/xAAAgAGAAIAAAAB/xAAAgAGAAIAAAAC/xAAAgAGAAIAAAAD/xAAAgAGAAIAAAAE/xAAAgAGAAIAAAAF/xAAAgAGAAIAAAAG/xAAAgAGAAIAAAAH/xAAAgAGAAIAAAAI/xAAAgAGAAIAAAAJ/xAAAgAGAAIAAAAK/xAAAgAGAAIAAAAL/xAAAgAGAAIAAAAM/xAAAgAGAAIAAAAN/xAAAgAGAAIAAAAO/xAAAgAGAAIAAAAP/xAAAgAGAAIAAAAQ/xAAAgAGAAIAAAAR/xAAAgAGAAIAAAAS/xAAAgAGAAIAAAAT/xAAAgAGAAIAAAAU/xAAAgAGAAIAAAAV/xAAAgAGAAIAAAAW/xAAAgAGAAIAAAAX/xAAAgAGAAIAAAAY/xAAAgAGAAIAAAAZ/xAAAgAGAAIAAAAAAAcAAgAKAAIAAAABAAcAAgAKAAIAAAACAAcAAgAKAAIAAAADAAcAAgAKAAIAAAAEAAcAAgAKAAIAAAAFAAcAAgAKAAIAAAAGAAcAAgAKAAIAAAAHAAcAAgAKAAIAAAAIAAcAAgAKAAIAAAAJAAcAAgAKAAIAAAAKAAcAAgAKAAIAAAALAAcAAgAKAAIAAAAMAAcAAgAKAAIAAAANAAcAAgAKAAIAAAAOAAcAAgAKAAIAAAAPAAcAAgAKAAIAAAAQAAcAAgAKAAIAAAARAAcAAgAKAAIAAAASAAcAAgAKAAIAAAATAAcAAgAKAAIAAAAUAAcAAgALAAIAAAAVAAcAAgALAAIAAAAWAAcAAgALAAIAAAAXAAcAAgALAAIAAAA=")
+tile_set = ExtResource("1_tileset")

@@ -13,11 +13,27 @@ const BOUNCE_IMMUNITY_DURATION: float = 0.3  # 0.3 seconds of immunity
 @export var plant_interaction_range: float = 1000.0  # How close player needs to be to control plants
 var debug_plant_interaction: bool = true
 
+# Drop-through platform system
+var drop_through_timer: float = 0.0
+const DROP_THROUGH_DURATION: float = 0.2  # How long to ignore one-way platforms
+
 
 func _physics_process(delta: float) -> void:
 	# Update bounce immunity timer
 	if bounce_immunity_time > 0:
 		bounce_immunity_time -= delta
+	
+	# Update drop-through timer
+	if drop_through_timer > 0:
+		drop_through_timer -= delta
+	
+	# Handle drop-through input (check for down arrow key)
+	if Input.is_action_just_pressed("move_down"):
+		if is_on_floor():
+			# Simple drop-through: disable collision temporarily and move down
+			drop_through_timer = DROP_THROUGH_DURATION
+			position.y += 10  # Move down to start falling through platforms
+			print("Dropping through platform!")
 	
 	# Add the gravity.
 	if not is_on_floor():
@@ -39,8 +55,22 @@ func _physics_process(delta: float) -> void:
 		# During bounce immunity, only apply friction, don't allow input control
 		velocity.x = move_toward(velocity.x, 0, SPEED * 0.1)  # Much slower deceleration during bounce
 
-	# Move and handle collisions using Godot's recommended approach
-	move_and_slide()
+	# Move and handle collisions using Godot's recommended approach  
+	# Temporarily disable one-way platform collision during drop-through
+	if drop_through_timer > 0:
+		# Save current collision state
+		var original_collision_layer = collision_layer
+		var original_collision_mask = collision_mask
+		
+		# Disable collision with platforms (assuming layer 1)
+		set_collision_mask_value(1, false)
+		move_and_slide()
+		
+		# Restore collision state  
+		collision_layer = original_collision_layer
+		collision_mask = original_collision_mask
+	else:
+		move_and_slide()
 	
 	# Check for collisions with mushroom objects
 	_check_mushroom_collisions()
@@ -57,6 +87,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		action_name = "grow_u"
 	elif event.is_action_pressed("flor_u"):
 		action_name = "flor_u"
+	elif event.is_action_pressed("clear_runes"):
+		action_name = "clear_runes"
 	
 	if action_name != "":
 		var nearest_plant = _find_nearest_plant()
