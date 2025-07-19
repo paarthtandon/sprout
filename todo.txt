@@ -1,0 +1,14 @@
+Mushroom *
+Brambles *
+Betels *
+Button/Door *
+NPC
+Starting setup
+Music file
+Particles
+Limiting the total runes per plant
+UI elements
+Show runes under plant
+Grey out runes when not usable
+Platforms
+drop down

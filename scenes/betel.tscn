@@ -1,0 +1,47 @@
+[gd_scene load_steps=8 format=3 uid="uid://dq8k1jfojqeai"]
+
+[ext_resource type="Script" uid="uid://uishm6jyu7gu" path="res://scenes/betel.gd" id="1_betel"]
+[ext_resource type="Texture2D" uid="uid://fy1u7fuprl1y" path="res://assets/combined_atlas.png" id="2_atlas"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_frame1"]
+atlas = ExtResource("2_atlas")
+region = Rect2(2432, 384, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_frame2"]
+atlas = ExtResource("2_atlas")
+region = Rect2(2560, 384, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_frame3"]
+atlas = ExtResource("2_atlas")
+region = Rect2(2688, 384, 128, 128)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_betel"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_frame1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_frame2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_frame3")
+}],
+"loop": true,
+"name": &"walk",
+"speed": 6.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_betel"]
+size = Vector2(108, 53)
+
+[node name="Betel" type="CharacterBody2D"]
+script = ExtResource("1_betel")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_betel")
+animation = &"walk"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 39.5)
+shape = SubResource("RectangleShape2D_betel")
