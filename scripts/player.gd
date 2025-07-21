@@ -32,7 +32,7 @@ func _physics_process(delta: float) -> void:
 		if is_on_floor():
 			# Simple drop-through: disable collision temporarily and move down
 			drop_through_timer = DROP_THROUGH_DURATION
-			position.y += 10  # Move down to start falling through platforms
+			position.y += 1  # Move down to start falling through platforms
 			print("Dropping through platform!")
 	
 	# Add the gravity.

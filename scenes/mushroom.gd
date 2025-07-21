@@ -26,8 +26,8 @@ var debug_mode := true
 var rune_ui: Node2D  # Reference to the rune UI component
 
 # Bounce properties - exported for easy tuning
-@export var growth_bounce_force: float = 3500.0
-@export var flower_bounce_force: float = 3500.0
+@export var growth_bounce_force: float = 3000.0
+@export var flower_bounce_force: float = 2500.0
 @export var flower_bounce_angle: float = 45.0  # Angle in degrees (0 = horizontal, 90 = vertical)
 
 # Collision shapes for different bounce types
@@ -290,11 +290,11 @@ func _fix_player_position_if_stuck() -> void:
 func _push_player_to_safety(player: CharacterBody2D) -> void:
 	# Try pushing the player in different directions to find a safe spot
 	var push_directions = [
-		Vector2(0, -150),   # Up (preferred for mushrooms)
-		Vector2(-100, -100), # Up-left diagonal
-		Vector2(100, -100),  # Up-right diagonal
-		Vector2(-150, 0),    # Left
-		Vector2(150, 0),     # Right
+		Vector2(0, -200),   # Up (preferred for mushrooms)
+		Vector2(-200, -200), # Up-left diagonal
+		Vector2(200, -200),  # Up-right diagonal
+		Vector2(-200, 0),    # Left
+		Vector2(200, 0),     # Right
 		Vector2(0, 50)       # Down (last resort)
 	]
 	
