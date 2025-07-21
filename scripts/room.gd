@@ -4,7 +4,7 @@ class_name Room
 # Room properties
 @export var room_name: String = "Room"
 @export var camera_position: Vector2 = Vector2.ZERO
-@export var room_size: Vector2 = Vector2(3072, 2048)  # Default room size
+@export var room_size: Vector2 = Vector2(1536, 1280)  # Default room size
 @export var transition_speed: float = 2.0  # How fast camera moves to this room
 @export var debug_mode: bool = true
 
